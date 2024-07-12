@@ -1,0 +1,15 @@
+# git
+
+# programming
+*.out
+*.o
+
+# R
+.RData
+.Rprofile
+
+# Fortran
+*.mod
+
+# python
+__pycache__
