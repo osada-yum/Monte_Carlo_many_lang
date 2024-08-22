@@ -26,11 +26,11 @@ contains
   end subroutine metropolis
   impure subroutine local_flip(x, y)
     integer(int64), intent(in) :: x, y
-    integer(int64) :: d
-    integer(int64) :: near_summ, near_x, near_y
-    integer(int64) :: delta_energy
+    integer(int32) :: d
+    integer(int32) :: near_summ, delta_energy
+    integer(int64) :: near_x, near_y
     real(real64) :: r
-    near_summ = 0_int64
+    near_summ = 0_int32
     do d = 1, size(dy)
        near_x = x + dx(d)
        if (near_x > nx) then
