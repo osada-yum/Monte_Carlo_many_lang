@@ -1,12 +1,14 @@
+import sys
+
 import numpy as np
 
 def metropolis(nx, ny, beta, spins):
-    for i in range(ny):
-        for j in range(0 + (i & 1), nx, 2):
-            local_flip(nx, ny, j, i, beta, spins)
-    for i in range(ny):
-        for j in range(1 - (i & 1), nx, 2):
-            local_flip(nx, ny, j, i, beta, spins)
+    for i in range(nx):
+        for j in range(0 + (i & 1), ny, 2):
+            local_flip(nx, ny, i, j, beta, spins)
+    for i in range(nx):
+        for j in range(1 - (i & 1), ny, 2):
+            local_flip(nx, ny, i, j, beta, spins)
 
 def local_flip(nx, ny, x, y, beta, spins):
     dx = np.array([1, 0, -1, 0])
@@ -30,15 +32,31 @@ def local_flip(nx, ny, x, y, beta, spins):
     elif np.exp(- beta * delta_energy) <= np.random.rand():
         spins[x][y] = - spins[x][y]
 
+def calc_magne(nx, ny, nall_inv, spins):
+    return np.sum(spins, axis = (0, 1)) * nall_inv
+
 
 nx = 100
-ny = 100
-kbt = 2.2
+ny = nx
+nall = nx * ny
+nall_inv = 1 / nall
+
+kbt = 2.3
 beta = 1 / kbt
-spins = np.ones(nx * ny).reshape(nx, ny)
-mcs = 100
+
+spins = np.ones(nx * ny, dtype = np.int32).reshape(nx, ny)
+
+mcs = 1000
+nsample = 100
+
+magnes = np.zeros(mcs, dtype = np.float64)
+
+for j in range(nsample):
+    print(f"sample {j + 1}", file = sys.stderr)
+    for i in range(mcs):
+        metropolis(nx, ny, beta, spins)
+        magnes[i] += calc_magne(nx, ny, nall_inv, spins)
 
 for i in range(mcs):
-    metropolis(nx, ny, beta, spins)
-
-print(spins)
+    print(f"{i + 1} {magnes[i]}")
+# print(spins)
