@@ -40,18 +40,38 @@ function local_update(nx, ny, x, y, beta, spins)
     end
 end
 
-function main(nx, ny, beta, mcs)
-    spins = ones(Int32, nx, ny)
-
-    for i = 1:mcs
-        metropolis(nx, ny, beta, spins)
+function calc_magne(nx, ny, nall_inv, spins)
+    summ = 0
+    for y = 1:ny
+        for x = 1:nx
+            summ += spins[x][y]
+        end
     end
-    println(spins)
+    summ * nall_inv
+end
+
+function main(nx, ny, nall_inv, beta, mcs, nsample)
+    magnes = zeros(Float64, mcs)
+    for j = 1:nsample
+        spins = ones(Int32, nx, ny)
+
+        for i = 1:mcs
+            metropolis(nx, ny, beta, spins)
+            magnes[i] += calc_magne(nx, ny, nall_inv, spins)
+        end
+    end
+    for i = 1:mcs
+        println(i, magnes[i])
+    end
+    # println(spins)
 end
 
 const nx = 100
-const ny = 100
-const kbt = 2.2
+const ny = ny
+const nall = nx * ny
+const nall_inv = 1 / nall
+const kbt = 2.3
 const beta = 1 / kbt
-const mcs = 100000
-@time main(nx, ny, beta, mcs)
+const mcs = 1000
+const nsample = 100
+@time main(nx, ny, nall_inv, beta, mcs, nsample)
